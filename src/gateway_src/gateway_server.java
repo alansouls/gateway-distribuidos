@@ -2,22 +2,20 @@ package gateway_src;
 import java.net.*;
 import java.util.ArrayList;
 import java.io.*;
-import protoClass.SensorOuterClass;
+//import protoClass.SensorOuterClass;
 import protoClass.SensorOuterClass.CommandMessage;
 import protoClass.SensorOuterClass.Sensor;
-import protoClass.SensorOuterClass.Sensor.SensorType;
+//import protoClass.SensorOuterClass.Sensor.SensorType;
 import protoClass.SensorOuterClass.CommandMessage.CommandType;
 
 public class gateway_server {
-	public static void main(String args[]) throws SocketException {
+	public static void main(String args[]) throws IOException {
 		ServerSocket listenSocket = null;
-		DatagramSocket UDPserverSocket = new DatagramSocket();
 		
-		ArrayList<InetAddress> listaLED	= new ArrayList<InetAddress>();
-		ArrayList<InetAddress> listaLAM	= new ArrayList<InetAddress>();
-		ArrayList<InetAddress> listaTEMP	= new ArrayList<InetAddress>();
+		ArrayList<sensorBuff> sensorList = new ArrayList<sensorBuff>();
 		
 		int serverPort = 7777; // the server port
+		int sensorPort = 8888; // the sensor port
 		try {
 			//Código_de_mensagem_de_descoberta
 			
@@ -25,30 +23,21 @@ public class gateway_server {
 			cmd.clear();
 			cmd.setCommand(CommandType.GET_STATE);
 			byte[] sendData = cmd.build().toByteArray();
-			DatagramPacket broadPacket = new DatagramPacket(sendData, sendData.length, UDPserverSocket.getLocalAddress(), 8888);
-			broadcast(broadPacket, InetAddress.getByName("255.255.255.255"), UDPserverSocket);
+			broadcast b = new broadcast(sendData, sensorPort);
+			b.start();
 			
-			SensorList s = new SensorList(listaLED, listaLAM, listaTEMP);
+			SensorProxy s = new SensorProxy(sensorList);
 			s.start();
-			
 			
 			listenSocket = new ServerSocket(serverPort);
 			while (true) {
 				Socket clientSocket = listenSocket.accept();
-				ConnectionTCP c = new ConnectionTCP(clientSocket, UDPserverSocket, listaLED, listaLAM, listaTEMP);
+				ConnectionTCP c = new ConnectionTCP(clientSocket, sensorList);
 				c.start();
 			}
 		} catch (IOException e) {
-			System.out.println("Listen socket:" + e.getMessage());
+
 		}
-	}
-	
-    public static void broadcast(DatagramPacket broadcastPacket, InetAddress address, DatagramSocket socket) throws IOException {
-    	      try {
-    	    	  socket.setBroadcast(true);
-      	          socket.send(broadcastPacket);
-    	    } catch (IOException e) {
-    	}
 	}
 }
 
@@ -56,60 +45,36 @@ class ConnectionTCP extends Thread {
 	DataInputStream in;
 	DataOutputStream out;
 	Socket clientSocket;
-	DatagramSocket UDPserverSocket;
-	ArrayList<InetAddress> listaLED;
-	ArrayList<InetAddress> listaLAM;
-	ArrayList<InetAddress> listaTEMP;
+	ArrayList<sensorBuff> sensorList;
+	CommandMessage.Builder cmd;
+	sensorBuff sb;
 
-	public ConnectionTCP(Socket aClientSocket, DatagramSocket aUDPserverSocket, ArrayList<InetAddress> listaLED, ArrayList<InetAddress> listaLAM,
-	ArrayList<InetAddress> listaTEMP) {
+	public ConnectionTCP(Socket aClientSocket, ArrayList<sensorBuff> sensorList) throws IOException, EOFException {
 		try {
 			clientSocket = aClientSocket;
-			UDPserverSocket = aUDPserverSocket;
+			this.sensorList = sensorList;
 			in = new DataInputStream(clientSocket.getInputStream());
 			out = new DataOutputStream(clientSocket.getOutputStream());
-		} catch (IOException e) {
+			cmd = CommandMessage.newBuilder();
+			sb = new sensorBuff();
 			
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	public void run() {
 		try {
-			CommandMessage.Builder cmd = CommandMessage.newBuilder();
-			CommandMessage CMDsensor = cmd.build().getParserForType().parseFrom(in);
-			//Preparando_pacote_UDP
+			cmd.build().parseFrom(in);
 			byte[] sendData = null;
-			byte[] receiveData = new byte[1000];
-			DatagramPacket requestPacket = null;
-			DatagramPacket replyPacket = null;
 			
-			if(CMDsensor.hasCommand() && CMDsensor.hasParameter()){
-				cmd.setCommand(CMDsensor.getCommand());
-				cmd.setParameter(CMDsensor.getParameter());
-				sendData = cmd.build().toByteArray();
-				
-				if(CMDsensor.getParameter().getType()==SensorType.LIGHT) {
-					for(int i=0; i<listaLED.size(); i++) {
-						requestPacket = new DatagramPacket(sendData, sendData.length, listaLED.get(i), 8888);
-						UDPserverSocket.send(requestPacket);
-					}
-				} else if(CMDsensor.getParameter().getType()==SensorType.LUMINOSITY) {
-					for(int i=0; i<listaLAM.size(); i++) {
-						requestPacket = new DatagramPacket(sendData, sendData.length, listaLAM.get(i), 8888);
-						UDPserverSocket.send(requestPacket);
-					}
-				} else if(CMDsensor.getParameter().getType()==SensorType.TEMPERATURE) {
-					for(int i=0; i<listaTEMP.size(); i++) {
-						requestPacket = new DatagramPacket(sendData, sendData.length, listaTEMP.get(i), 8888);
-						UDPserverSocket.send(requestPacket);
-					}
+			if(cmd.hasCommand() && cmd.hasParameter()){
+				if(sb.containSensorPerID(cmd.getParameter(), sensorList)) {
+					cmd.setParameter(sensorList.get(sb.sensorListIndex(cmd.getParameter(), sensorList)).getSensor());
+					sendData = cmd.build().toByteArray();
+					out.write(sendData);
+				}
 			}
-					
-					
-			replyPacket = new DatagramPacket(receiveData, receiveData.length);
-			UDPserverSocket.receive(replyPacket);
-			out.write(replyPacket.getData());	
-		}
 			
 		} catch (EOFException e) {
 			
@@ -118,32 +83,32 @@ class ConnectionTCP extends Thread {
 		} finally {
 				try {
 					clientSocket.close();
+					in.close();
+					out.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
 				}
-				UDPserverSocket.close();
 		}
 
 	}
 }
 
-class SensorList extends Thread{
+class SensorProxy extends Thread{
 	DatagramSocket DemonSocket;
 	DatagramPacket DemonPacket;
-	ArrayList<InetAddress> listaLED;
-	ArrayList<InetAddress> listaLAM;
-	ArrayList<InetAddress> listaTEMP;
+	ArrayList<sensorBuff> sensorList;
 	byte[] receiveData;
-	public SensorList(ArrayList<InetAddress> alistaLED, ArrayList<InetAddress> alistaLAM,
-			ArrayList<InetAddress> alistaTEMP) throws IOException {
+	CommandMessage.Builder cmd;
+	sensorBuff s;
+	
+	public SensorProxy(ArrayList<sensorBuff> sensorList) throws IOException {
 		
-	listaLED = alistaLED;
-	listaLAM = alistaLAM;
-	listaTEMP = alistaTEMP;
-	byte[] receiveData = new byte[5];
-	DemonSocket = new DatagramSocket();
-	DemonPacket = new DatagramPacket(receiveData, receiveData.length);
+		this.sensorList = sensorList;
+		byte[] receiveData = new byte[5];
+		DemonSocket = new DatagramSocket();
+		DemonPacket = new DatagramPacket(receiveData, receiveData.length);
+		cmd = CommandMessage.newBuilder();
+		s = new sensorBuff();
 		
 	}
 	
@@ -151,28 +116,84 @@ class SensorList extends Thread{
 		try {
 			while(true) {
 				DemonSocket.receive(DemonPacket);
-				CommandMessage.Builder cmd = CommandMessage.newBuilder();
-				CommandMessage CMDsensor = cmd.build().getParserForType().parseFrom(DemonPacket.getData());
-				if(CMDsensor.getParameter().getType()==SensorType.LIGHT && listaLED.contains(DemonPacket.getAddress())==false) {
-					for(int i=0; i<listaLED.size(); i++) {
-						listaLED.add(DemonPacket.getAddress());
+				cmd.build().getParserForType().parseFrom(DemonPacket.getData());
+				Sensor sensor = cmd.getParameter();
+				s = new sensorBuff();
+				//Setando campos do buffer de sensor
+				s.setIP(DemonPacket.getAddress());
+				s.setPort(DemonPacket.getPort());
+				s.setSensor(sensor);
+				
+				if(s.containSensorPerID(sensor, sensorList)==false) {
+					sensorList.add(s);
+				} else {	
+					if(sensor.getData().getYear() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() || 
+					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() && 
+					  sensor.getData().getMonth() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth()) ||
+					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
+					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
+					  sensor.getData().getDay() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay()) ||
+					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
+					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
+					  sensor.getData().getDay() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay() &&
+					  sensor.getData().getHours() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getHours()) ||
+					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
+					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
+					  sensor.getData().getDay() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay() &&
+					  sensor.getData().getHours() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getHours() &&
+					  sensor.getData().getMinutes() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMinutes()) ||
+					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
+					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
+					  sensor.getData().getDay() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay() &&
+					  sensor.getData().getHours() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getHours() &&
+					  sensor.getData().getMinutes() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMinutes() &&
+					  sensor.getData().getSeconds() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getSeconds())) {
+						
+						sensorList.remove(s.sensorListIndex(sensor, sensorList));
+						sensorList.add(s);
 					}
-				} else if(CMDsensor.getParameter().getType()==SensorType.LUMINOSITY && listaLED.contains(DemonPacket.getAddress())==false) {
-					for(int i=0; i<listaLAM.size(); i++) {
-						listaLAM.add(DemonPacket.getAddress());
-					}
-				} else if(CMDsensor.getParameter().getType()==SensorType.TEMPERATURE && listaLED.contains(DemonPacket.getAddress())==false) {
-					for(int i=0; i<listaTEMP.size(); i++) {
-						listaTEMP.add(DemonPacket.getAddress());
-					}
-			}
-			
+				}
+				cmd.clear();
+				DemonPacket.setData(null);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+		}	
+	}
+
+}
+
+class broadcast extends Thread{
+	DatagramSocket broadSocket;
+	DatagramPacket broadPacket;
+	byte[] recData;
+	int sensorPort;
+	
+	public broadcast(byte[] recData, int sensorPort) throws UnknownHostException, IOException {
+		this.recData = recData;
+		this.sensorPort = sensorPort;
+		broadPacket = new DatagramPacket(recData,recData.length,InetAddress.getByName("255.255.255.255"),sensorPort);
+		broadSocket = new DatagramSocket();
+	}
+	
+	public void run(){
+		try {
+			broadSocket.setBroadcast(true);
+		} catch (SocketException e2) {
+			e2.printStackTrace();
+		}
+		while(true) {
+			try {
+				broadSocket.send(broadPacket);
+				Thread.sleep(1000);
+			} catch (SocketException e1) {
+				e1.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}
 }
-
