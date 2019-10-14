@@ -2,6 +2,7 @@ package gateway_src;
 import java.net.*;
 import java.util.ArrayList;
 import java.io.*;
+import java.time.*;
 //import protoClass.SensorOuterClass;
 import protoClass.SensorOuterClass.CommandMessage;
 import protoClass.SensorOuterClass.Sensor;
@@ -71,6 +72,7 @@ class ConnectionTCP extends Thread {
 			if(cmd.hasCommand() && cmd.hasParameter()){
 				if(sb.containSensorPerID(cmd.getParameter(), sensorList)) {
 					cmd.setParameter(sensorList.get(sb.sensorListIndex(cmd.getParameter(), sensorList)).getSensor());
+					cmd.setCommand(null);
 					sendData = cmd.build().toByteArray();
 					out.write(sendData);
 				}
@@ -119,7 +121,7 @@ class SensorProxy extends Thread{
 				cmd.build().getParserForType().parseFrom(DemonPacket.getData());
 				Sensor sensor = cmd.getParameter();
 				s = new sensorBuff();
-				//Setando campos do buffer de sensor
+				//Setando_campos_do_buffer_de_sensor
 				s.setIP(DemonPacket.getAddress());
 				s.setPort(DemonPacket.getPort());
 				s.setSensor(sensor);
