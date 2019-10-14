@@ -36,7 +36,7 @@ public class gateway_server {
 				c.start();
 			}
 		} catch (IOException e) {
-
+			e.printStackTrace();
 		}
 	}
 }
@@ -65,7 +65,7 @@ class ConnectionTCP extends Thread {
 
 	public void run() {
 		try {
-			cmd.build().parseFrom(in);
+			cmd.build().getParserForType().parseFrom(in);
 			byte[] sendData = null;
 			
 			if(cmd.hasCommand() && cmd.hasParameter()){
@@ -77,16 +77,16 @@ class ConnectionTCP extends Thread {
 			}
 			
 		} catch (EOFException e) {
-			
+			e.printStackTrace();
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		} finally {
 				try {
 					clientSocket.close();
 					in.close();
 					out.close();
 				} catch (IOException e) {
-
+					e.printStackTrace();
 				}
 		}
 
@@ -157,7 +157,7 @@ class SensorProxy extends Thread{
 				DemonPacket.setData(null);
 			}
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		}	
 	}
 
