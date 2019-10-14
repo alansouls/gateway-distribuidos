@@ -46,17 +46,32 @@ public final class SensorOuterClass {
     float getState();
 
     /**
-     * <code>required .time data = 4;</code>
+     * <code>required string date = 4;</code>
      */
-    boolean hasData();
+    boolean hasDate();
     /**
-     * <code>required .time data = 4;</code>
+     * <code>required string date = 4;</code>
      */
-    SensorOuterClass.time getData();
+    java.lang.String getDate();
     /**
-     * <code>required .time data = 4;</code>
+     * <code>required string date = 4;</code>
      */
-    SensorOuterClass.timeOrBuilder getDataOrBuilder();
+    com.google.protobuf.ByteString
+        getDateBytes();
+
+    /**
+     * <code>required string instant = 5;</code>
+     */
+    boolean hasInstant();
+    /**
+     * <code>required string instant = 5;</code>
+     */
+    java.lang.String getInstant();
+    /**
+     * <code>required string instant = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getInstantBytes();
   }
   /**
    * Protobuf type {@code Sensor}
@@ -72,6 +87,8 @@ public final class SensorOuterClass {
     }
     private Sensor() {
       type_ = 0;
+      date_ = "";
+      instant_ = "";
     }
 
     @java.lang.Override
@@ -128,16 +145,15 @@ public final class SensorOuterClass {
               break;
             }
             case 34: {
-              SensorOuterClass.time.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000008) != 0)) {
-                subBuilder = data_.toBuilder();
-              }
-              data_ = input.readMessage(SensorOuterClass.time.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(data_);
-                data_ = subBuilder.buildPartial();
-              }
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000008;
+              date_ = bs;
+              break;
+            }
+            case 42: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000010;
+              instant_ = bs;
               break;
             }
             default: {
@@ -319,25 +335,88 @@ public final class SensorOuterClass {
       return state_;
     }
 
-    public static final int DATA_FIELD_NUMBER = 4;
-    private SensorOuterClass.time data_;
+    public static final int DATE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object date_;
     /**
-     * <code>required .time data = 4;</code>
+     * <code>required string date = 4;</code>
      */
-    public boolean hasData() {
+    public boolean hasDate() {
       return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>required .time data = 4;</code>
+     * <code>required string date = 4;</code>
      */
-    public SensorOuterClass.time getData() {
-      return data_ == null ? SensorOuterClass.time.getDefaultInstance() : data_;
+    public java.lang.String getDate() {
+      java.lang.Object ref = date_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          date_ = s;
+        }
+        return s;
+      }
     }
     /**
-     * <code>required .time data = 4;</code>
+     * <code>required string date = 4;</code>
      */
-    public SensorOuterClass.timeOrBuilder getDataOrBuilder() {
-      return data_ == null ? SensorOuterClass.time.getDefaultInstance() : data_;
+    public com.google.protobuf.ByteString
+        getDateBytes() {
+      java.lang.Object ref = date_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        date_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int INSTANT_FIELD_NUMBER = 5;
+    private volatile java.lang.Object instant_;
+    /**
+     * <code>required string instant = 5;</code>
+     */
+    public boolean hasInstant() {
+      return ((bitField0_ & 0x00000010) != 0);
+    }
+    /**
+     * <code>required string instant = 5;</code>
+     */
+    public java.lang.String getInstant() {
+      java.lang.Object ref = instant_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          instant_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string instant = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInstantBytes() {
+      java.lang.Object ref = instant_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        instant_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -359,11 +438,11 @@ public final class SensorOuterClass {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasData()) {
+      if (!hasDate()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!getData().isInitialized()) {
+      if (!hasInstant()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -384,7 +463,10 @@ public final class SensorOuterClass {
         output.writeFloat(3, state_);
       }
       if (((bitField0_ & 0x00000008) != 0)) {
-        output.writeMessage(4, getData());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, date_);
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, instant_);
       }
       unknownFields.writeTo(output);
     }
@@ -408,8 +490,10 @@ public final class SensorOuterClass {
           .computeFloatSize(3, state_);
       }
       if (((bitField0_ & 0x00000008) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getData());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, date_);
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, instant_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -441,10 +525,15 @@ public final class SensorOuterClass {
             != java.lang.Float.floatToIntBits(
                 other.getState())) return false;
       }
-      if (hasData() != other.hasData()) return false;
-      if (hasData()) {
-        if (!getData()
-            .equals(other.getData())) return false;
+      if (hasDate() != other.hasDate()) return false;
+      if (hasDate()) {
+        if (!getDate()
+            .equals(other.getDate())) return false;
+      }
+      if (hasInstant() != other.hasInstant()) return false;
+      if (hasInstant()) {
+        if (!getInstant()
+            .equals(other.getInstant())) return false;
       }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -470,9 +559,13 @@ public final class SensorOuterClass {
         hash = (53 * hash) + java.lang.Float.floatToIntBits(
             getState());
       }
-      if (hasData()) {
-        hash = (37 * hash) + DATA_FIELD_NUMBER;
-        hash = (53 * hash) + getData().hashCode();
+      if (hasDate()) {
+        hash = (37 * hash) + DATE_FIELD_NUMBER;
+        hash = (53 * hash) + getDate().hashCode();
+      }
+      if (hasInstant()) {
+        hash = (37 * hash) + INSTANT_FIELD_NUMBER;
+        hash = (53 * hash) + getInstant().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -602,7 +695,6 @@ public final class SensorOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getDataFieldBuilder();
         }
       }
       @java.lang.Override
@@ -614,12 +706,10 @@ public final class SensorOuterClass {
         bitField0_ = (bitField0_ & ~0x00000002);
         state_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000004);
-        if (dataBuilder_ == null) {
-          data_ = null;
-        } else {
-          dataBuilder_.clear();
-        }
+        date_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
+        instant_ = "";
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -661,13 +751,13 @@ public final class SensorOuterClass {
           to_bitField0_ |= 0x00000004;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
-          if (dataBuilder_ == null) {
-            result.data_ = data_;
-          } else {
-            result.data_ = dataBuilder_.build();
-          }
           to_bitField0_ |= 0x00000008;
         }
+        result.date_ = date_;
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.instant_ = instant_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -726,8 +816,15 @@ public final class SensorOuterClass {
         if (other.hasState()) {
           setState(other.getState());
         }
-        if (other.hasData()) {
-          mergeData(other.getData());
+        if (other.hasDate()) {
+          bitField0_ |= 0x00000008;
+          date_ = other.date_;
+          onChanged();
+        }
+        if (other.hasInstant()) {
+          bitField0_ |= 0x00000010;
+          instant_ = other.instant_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -745,10 +842,10 @@ public final class SensorOuterClass {
         if (!hasState()) {
           return false;
         }
-        if (!hasData()) {
+        if (!hasDate()) {
           return false;
         }
-        if (!getData().isInitialized()) {
+        if (!hasInstant()) {
           return false;
         }
         return true;
@@ -875,122 +972,156 @@ public final class SensorOuterClass {
         return this;
       }
 
-      private SensorOuterClass.time data_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          SensorOuterClass.time, SensorOuterClass.time.Builder, SensorOuterClass.timeOrBuilder> dataBuilder_;
+      private java.lang.Object date_ = "";
       /**
-       * <code>required .time data = 4;</code>
+       * <code>required string date = 4;</code>
        */
-      public boolean hasData() {
+      public boolean hasDate() {
         return ((bitField0_ & 0x00000008) != 0);
       }
       /**
-       * <code>required .time data = 4;</code>
+       * <code>required string date = 4;</code>
        */
-      public SensorOuterClass.time getData() {
-        if (dataBuilder_ == null) {
-          return data_ == null ? SensorOuterClass.time.getDefaultInstance() : data_;
-        } else {
-          return dataBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>required .time data = 4;</code>
-       */
-      public Builder setData(SensorOuterClass.time value) {
-        if (dataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
+      public java.lang.String getDate() {
+        java.lang.Object ref = date_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            date_ = s;
           }
-          data_ = value;
-          onChanged();
+          return s;
         } else {
-          dataBuilder_.setMessage(value);
+          return (java.lang.String) ref;
         }
-        bitField0_ |= 0x00000008;
-        return this;
       }
       /**
-       * <code>required .time data = 4;</code>
+       * <code>required string date = 4;</code>
        */
-      public Builder setData(
-          SensorOuterClass.time.Builder builderForValue) {
-        if (dataBuilder_ == null) {
-          data_ = builderForValue.build();
-          onChanged();
+      public com.google.protobuf.ByteString
+          getDateBytes() {
+        java.lang.Object ref = date_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          date_ = b;
+          return b;
         } else {
-          dataBuilder_.setMessage(builderForValue.build());
+          return (com.google.protobuf.ByteString) ref;
         }
-        bitField0_ |= 0x00000008;
-        return this;
       }
       /**
-       * <code>required .time data = 4;</code>
+       * <code>required string date = 4;</code>
        */
-      public Builder mergeData(SensorOuterClass.time value) {
-        if (dataBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) != 0) &&
-              data_ != null &&
-              data_ != SensorOuterClass.time.getDefaultInstance()) {
-            data_ =
-              SensorOuterClass.time.newBuilder(data_).mergeFrom(value).buildPartial();
-          } else {
-            data_ = value;
-          }
-          onChanged();
-        } else {
-          dataBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000008;
-        return this;
-      }
-      /**
-       * <code>required .time data = 4;</code>
-       */
-      public Builder clearData() {
-        if (dataBuilder_ == null) {
-          data_ = null;
-          onChanged();
-        } else {
-          dataBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000008);
-        return this;
-      }
-      /**
-       * <code>required .time data = 4;</code>
-       */
-      public SensorOuterClass.time.Builder getDataBuilder() {
-        bitField0_ |= 0x00000008;
+      public Builder setDate(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        date_ = value;
         onChanged();
-        return getDataFieldBuilder().getBuilder();
+        return this;
       }
       /**
-       * <code>required .time data = 4;</code>
+       * <code>required string date = 4;</code>
        */
-      public SensorOuterClass.timeOrBuilder getDataOrBuilder() {
-        if (dataBuilder_ != null) {
-          return dataBuilder_.getMessageOrBuilder();
+      public Builder clearDate() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        date_ = getDefaultInstance().getDate();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string date = 4;</code>
+       */
+      public Builder setDateBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        date_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object instant_ = "";
+      /**
+       * <code>required string instant = 5;</code>
+       */
+      public boolean hasInstant() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>required string instant = 5;</code>
+       */
+      public java.lang.String getInstant() {
+        java.lang.Object ref = instant_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            instant_ = s;
+          }
+          return s;
         } else {
-          return data_ == null ?
-              SensorOuterClass.time.getDefaultInstance() : data_;
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>required .time data = 4;</code>
+       * <code>required string instant = 5;</code>
        */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          SensorOuterClass.time, SensorOuterClass.time.Builder, SensorOuterClass.timeOrBuilder> 
-          getDataFieldBuilder() {
-        if (dataBuilder_ == null) {
-          dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              SensorOuterClass.time, SensorOuterClass.time.Builder, SensorOuterClass.timeOrBuilder>(
-                  getData(),
-                  getParentForChildren(),
-                  isClean());
-          data_ = null;
+      public com.google.protobuf.ByteString
+          getInstantBytes() {
+        java.lang.Object ref = instant_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          instant_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
         }
-        return dataBuilder_;
+      }
+      /**
+       * <code>required string instant = 5;</code>
+       */
+      public Builder setInstant(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        instant_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string instant = 5;</code>
+       */
+      public Builder clearInstant() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        instant_ = getDefaultInstance().getInstant();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string instant = 5;</code>
+       */
+      public Builder setInstantBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        instant_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -1040,988 +1171,6 @@ public final class SensorOuterClass {
 
     @java.lang.Override
     public SensorOuterClass.Sensor getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface timeOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:time)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required int32 seconds = 1;</code>
-     */
-    boolean hasSeconds();
-    /**
-     * <code>required int32 seconds = 1;</code>
-     */
-    int getSeconds();
-
-    /**
-     * <code>required int32 minutes = 2;</code>
-     */
-    boolean hasMinutes();
-    /**
-     * <code>required int32 minutes = 2;</code>
-     */
-    int getMinutes();
-
-    /**
-     * <code>required int32 hours = 3;</code>
-     */
-    boolean hasHours();
-    /**
-     * <code>required int32 hours = 3;</code>
-     */
-    int getHours();
-
-    /**
-     * <code>required int32 day = 4;</code>
-     */
-    boolean hasDay();
-    /**
-     * <code>required int32 day = 4;</code>
-     */
-    int getDay();
-
-    /**
-     * <code>required int32 month = 5;</code>
-     */
-    boolean hasMonth();
-    /**
-     * <code>required int32 month = 5;</code>
-     */
-    int getMonth();
-
-    /**
-     * <code>required int32 year = 6;</code>
-     */
-    boolean hasYear();
-    /**
-     * <code>required int32 year = 6;</code>
-     */
-    int getYear();
-  }
-  /**
-   * Protobuf type {@code time}
-   */
-  public  static final class time extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:time)
-      timeOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use time.newBuilder() to construct.
-    private time(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private time() {
-    }
-
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new time();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private time(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-              bitField0_ |= 0x00000001;
-              seconds_ = input.readInt32();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              minutes_ = input.readInt32();
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              hours_ = input.readInt32();
-              break;
-            }
-            case 32: {
-              bitField0_ |= 0x00000008;
-              day_ = input.readInt32();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000010;
-              month_ = input.readInt32();
-              break;
-            }
-            case 48: {
-              bitField0_ |= 0x00000020;
-              year_ = input.readInt32();
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return SensorOuterClass.internal_static_time_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return SensorOuterClass.internal_static_time_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              SensorOuterClass.time.class, SensorOuterClass.time.Builder.class);
-    }
-
-    private int bitField0_;
-    public static final int SECONDS_FIELD_NUMBER = 1;
-    private int seconds_;
-    /**
-     * <code>required int32 seconds = 1;</code>
-     */
-    public boolean hasSeconds() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>required int32 seconds = 1;</code>
-     */
-    public int getSeconds() {
-      return seconds_;
-    }
-
-    public static final int MINUTES_FIELD_NUMBER = 2;
-    private int minutes_;
-    /**
-     * <code>required int32 minutes = 2;</code>
-     */
-    public boolean hasMinutes() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>required int32 minutes = 2;</code>
-     */
-    public int getMinutes() {
-      return minutes_;
-    }
-
-    public static final int HOURS_FIELD_NUMBER = 3;
-    private int hours_;
-    /**
-     * <code>required int32 hours = 3;</code>
-     */
-    public boolean hasHours() {
-      return ((bitField0_ & 0x00000004) != 0);
-    }
-    /**
-     * <code>required int32 hours = 3;</code>
-     */
-    public int getHours() {
-      return hours_;
-    }
-
-    public static final int DAY_FIELD_NUMBER = 4;
-    private int day_;
-    /**
-     * <code>required int32 day = 4;</code>
-     */
-    public boolean hasDay() {
-      return ((bitField0_ & 0x00000008) != 0);
-    }
-    /**
-     * <code>required int32 day = 4;</code>
-     */
-    public int getDay() {
-      return day_;
-    }
-
-    public static final int MONTH_FIELD_NUMBER = 5;
-    private int month_;
-    /**
-     * <code>required int32 month = 5;</code>
-     */
-    public boolean hasMonth() {
-      return ((bitField0_ & 0x00000010) != 0);
-    }
-    /**
-     * <code>required int32 month = 5;</code>
-     */
-    public int getMonth() {
-      return month_;
-    }
-
-    public static final int YEAR_FIELD_NUMBER = 6;
-    private int year_;
-    /**
-     * <code>required int32 year = 6;</code>
-     */
-    public boolean hasYear() {
-      return ((bitField0_ & 0x00000020) != 0);
-    }
-    /**
-     * <code>required int32 year = 6;</code>
-     */
-    public int getYear() {
-      return year_;
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      if (!hasSeconds()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasMinutes()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasHours()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDay()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasMonth()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasYear()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeInt32(1, seconds_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeInt32(2, minutes_);
-      }
-      if (((bitField0_ & 0x00000004) != 0)) {
-        output.writeInt32(3, hours_);
-      }
-      if (((bitField0_ & 0x00000008) != 0)) {
-        output.writeInt32(4, day_);
-      }
-      if (((bitField0_ & 0x00000010) != 0)) {
-        output.writeInt32(5, month_);
-      }
-      if (((bitField0_ & 0x00000020) != 0)) {
-        output.writeInt32(6, year_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, seconds_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, minutes_);
-      }
-      if (((bitField0_ & 0x00000004) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, hours_);
-      }
-      if (((bitField0_ & 0x00000008) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, day_);
-      }
-      if (((bitField0_ & 0x00000010) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, month_);
-      }
-      if (((bitField0_ & 0x00000020) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, year_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof SensorOuterClass.time)) {
-        return super.equals(obj);
-      }
-      SensorOuterClass.time other = (SensorOuterClass.time) obj;
-
-      if (hasSeconds() != other.hasSeconds()) return false;
-      if (hasSeconds()) {
-        if (getSeconds()
-            != other.getSeconds()) return false;
-      }
-      if (hasMinutes() != other.hasMinutes()) return false;
-      if (hasMinutes()) {
-        if (getMinutes()
-            != other.getMinutes()) return false;
-      }
-      if (hasHours() != other.hasHours()) return false;
-      if (hasHours()) {
-        if (getHours()
-            != other.getHours()) return false;
-      }
-      if (hasDay() != other.hasDay()) return false;
-      if (hasDay()) {
-        if (getDay()
-            != other.getDay()) return false;
-      }
-      if (hasMonth() != other.hasMonth()) return false;
-      if (hasMonth()) {
-        if (getMonth()
-            != other.getMonth()) return false;
-      }
-      if (hasYear() != other.hasYear()) return false;
-      if (hasYear()) {
-        if (getYear()
-            != other.getYear()) return false;
-      }
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasSeconds()) {
-        hash = (37 * hash) + SECONDS_FIELD_NUMBER;
-        hash = (53 * hash) + getSeconds();
-      }
-      if (hasMinutes()) {
-        hash = (37 * hash) + MINUTES_FIELD_NUMBER;
-        hash = (53 * hash) + getMinutes();
-      }
-      if (hasHours()) {
-        hash = (37 * hash) + HOURS_FIELD_NUMBER;
-        hash = (53 * hash) + getHours();
-      }
-      if (hasDay()) {
-        hash = (37 * hash) + DAY_FIELD_NUMBER;
-        hash = (53 * hash) + getDay();
-      }
-      if (hasMonth()) {
-        hash = (37 * hash) + MONTH_FIELD_NUMBER;
-        hash = (53 * hash) + getMonth();
-      }
-      if (hasYear()) {
-        hash = (37 * hash) + YEAR_FIELD_NUMBER;
-        hash = (53 * hash) + getYear();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static SensorOuterClass.time parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static SensorOuterClass.time parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static SensorOuterClass.time parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static SensorOuterClass.time parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static SensorOuterClass.time parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static SensorOuterClass.time parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static SensorOuterClass.time parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static SensorOuterClass.time parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static SensorOuterClass.time parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static SensorOuterClass.time parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static SensorOuterClass.time parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static SensorOuterClass.time parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(SensorOuterClass.time prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code time}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:time)
-        SensorOuterClass.timeOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return SensorOuterClass.internal_static_time_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return SensorOuterClass.internal_static_time_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                SensorOuterClass.time.class, SensorOuterClass.time.Builder.class);
-      }
-
-      // Construct using SensorOuterClass.time.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        seconds_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        minutes_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        hours_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        day_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        month_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000010);
-        year_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000020);
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return SensorOuterClass.internal_static_time_descriptor;
-      }
-
-      @java.lang.Override
-      public SensorOuterClass.time getDefaultInstanceForType() {
-        return SensorOuterClass.time.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public SensorOuterClass.time build() {
-        SensorOuterClass.time result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public SensorOuterClass.time buildPartial() {
-        SensorOuterClass.time result = new SensorOuterClass.time(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.seconds_ = seconds_;
-          to_bitField0_ |= 0x00000001;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.minutes_ = minutes_;
-          to_bitField0_ |= 0x00000002;
-        }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.hours_ = hours_;
-          to_bitField0_ |= 0x00000004;
-        }
-        if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.day_ = day_;
-          to_bitField0_ |= 0x00000008;
-        }
-        if (((from_bitField0_ & 0x00000010) != 0)) {
-          result.month_ = month_;
-          to_bitField0_ |= 0x00000010;
-        }
-        if (((from_bitField0_ & 0x00000020) != 0)) {
-          result.year_ = year_;
-          to_bitField0_ |= 0x00000020;
-        }
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof SensorOuterClass.time) {
-          return mergeFrom((SensorOuterClass.time)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(SensorOuterClass.time other) {
-        if (other == SensorOuterClass.time.getDefaultInstance()) return this;
-        if (other.hasSeconds()) {
-          setSeconds(other.getSeconds());
-        }
-        if (other.hasMinutes()) {
-          setMinutes(other.getMinutes());
-        }
-        if (other.hasHours()) {
-          setHours(other.getHours());
-        }
-        if (other.hasDay()) {
-          setDay(other.getDay());
-        }
-        if (other.hasMonth()) {
-          setMonth(other.getMonth());
-        }
-        if (other.hasYear()) {
-          setYear(other.getYear());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        if (!hasSeconds()) {
-          return false;
-        }
-        if (!hasMinutes()) {
-          return false;
-        }
-        if (!hasHours()) {
-          return false;
-        }
-        if (!hasDay()) {
-          return false;
-        }
-        if (!hasMonth()) {
-          return false;
-        }
-        if (!hasYear()) {
-          return false;
-        }
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        SensorOuterClass.time parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (SensorOuterClass.time) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      private int seconds_ ;
-      /**
-       * <code>required int32 seconds = 1;</code>
-       */
-      public boolean hasSeconds() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>required int32 seconds = 1;</code>
-       */
-      public int getSeconds() {
-        return seconds_;
-      }
-      /**
-       * <code>required int32 seconds = 1;</code>
-       */
-      public Builder setSeconds(int value) {
-        bitField0_ |= 0x00000001;
-        seconds_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 seconds = 1;</code>
-       */
-      public Builder clearSeconds() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        seconds_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int minutes_ ;
-      /**
-       * <code>required int32 minutes = 2;</code>
-       */
-      public boolean hasMinutes() {
-        return ((bitField0_ & 0x00000002) != 0);
-      }
-      /**
-       * <code>required int32 minutes = 2;</code>
-       */
-      public int getMinutes() {
-        return minutes_;
-      }
-      /**
-       * <code>required int32 minutes = 2;</code>
-       */
-      public Builder setMinutes(int value) {
-        bitField0_ |= 0x00000002;
-        minutes_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 minutes = 2;</code>
-       */
-      public Builder clearMinutes() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        minutes_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int hours_ ;
-      /**
-       * <code>required int32 hours = 3;</code>
-       */
-      public boolean hasHours() {
-        return ((bitField0_ & 0x00000004) != 0);
-      }
-      /**
-       * <code>required int32 hours = 3;</code>
-       */
-      public int getHours() {
-        return hours_;
-      }
-      /**
-       * <code>required int32 hours = 3;</code>
-       */
-      public Builder setHours(int value) {
-        bitField0_ |= 0x00000004;
-        hours_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 hours = 3;</code>
-       */
-      public Builder clearHours() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        hours_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int day_ ;
-      /**
-       * <code>required int32 day = 4;</code>
-       */
-      public boolean hasDay() {
-        return ((bitField0_ & 0x00000008) != 0);
-      }
-      /**
-       * <code>required int32 day = 4;</code>
-       */
-      public int getDay() {
-        return day_;
-      }
-      /**
-       * <code>required int32 day = 4;</code>
-       */
-      public Builder setDay(int value) {
-        bitField0_ |= 0x00000008;
-        day_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 day = 4;</code>
-       */
-      public Builder clearDay() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        day_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int month_ ;
-      /**
-       * <code>required int32 month = 5;</code>
-       */
-      public boolean hasMonth() {
-        return ((bitField0_ & 0x00000010) != 0);
-      }
-      /**
-       * <code>required int32 month = 5;</code>
-       */
-      public int getMonth() {
-        return month_;
-      }
-      /**
-       * <code>required int32 month = 5;</code>
-       */
-      public Builder setMonth(int value) {
-        bitField0_ |= 0x00000010;
-        month_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 month = 5;</code>
-       */
-      public Builder clearMonth() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        month_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int year_ ;
-      /**
-       * <code>required int32 year = 6;</code>
-       */
-      public boolean hasYear() {
-        return ((bitField0_ & 0x00000020) != 0);
-      }
-      /**
-       * <code>required int32 year = 6;</code>
-       */
-      public int getYear() {
-        return year_;
-      }
-      /**
-       * <code>required int32 year = 6;</code>
-       */
-      public Builder setYear(int value) {
-        bitField0_ |= 0x00000020;
-        year_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 year = 6;</code>
-       */
-      public Builder clearYear() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        year_ = 0;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:time)
-    }
-
-    // @@protoc_insertion_point(class_scope:time)
-    private static final SensorOuterClass.time DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new SensorOuterClass.time();
-    }
-
-    public static SensorOuterClass.time getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<time>
-        PARSER = new com.google.protobuf.AbstractParser<time>() {
-      @java.lang.Override
-      public time parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new time(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<time> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<time> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public SensorOuterClass.time getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2873,11 +2022,6 @@ public final class SensorOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Sensor_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_time_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_time_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_CommandMessage_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -2891,17 +2035,15 @@ public final class SensorOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014sensor.proto\"\224\001\n\006Sensor\022 \n\004type\030\001 \002(\0162" +
+      "\n\014sensor.proto\"\236\001\n\006Sensor\022 \n\004type\030\001 \002(\0162" +
       "\022.Sensor.SensorType\022\n\n\002id\030\002 \002(\005\022\r\n\005state" +
-      "\030\003 \002(\002\022\023\n\004data\030\004 \002(\0132\005.time\"8\n\nSensorTyp" +
-      "e\022\017\n\013TEMPERATURE\020\000\022\t\n\005LIGHT\020\001\022\016\n\nLUMINOS" +
-      "ITY\020\002\"a\n\004time\022\017\n\007seconds\030\001 \002(\005\022\017\n\007minute" +
-      "s\030\002 \002(\005\022\r\n\005hours\030\003 \002(\005\022\013\n\003day\030\004 \002(\005\022\r\n\005m" +
-      "onth\030\005 \002(\005\022\014\n\004year\030\006 \002(\005\"\231\001\n\016CommandMess" +
-      "age\022,\n\007command\030\001 \002(\0162\033.CommandMessage.Co" +
-      "mmandType\022\032\n\tparameter\030\002 \001(\0132\007.Sensor\"=\n" +
-      "\013CommandType\022\r\n\tGET_STATE\020\000\022\r\n\tSET_STATE" +
-      "\020\001\022\020\n\014SENSOR_STATE\020\002"
+      "\030\003 \002(\002\022\014\n\004date\030\004 \002(\t\022\017\n\007instant\030\005 \002(\t\"8\n" +
+      "\nSensorType\022\017\n\013TEMPERATURE\020\000\022\t\n\005LIGHT\020\001\022" +
+      "\016\n\nLUMINOSITY\020\002\"\231\001\n\016CommandMessage\022,\n\007co" +
+      "mmand\030\001 \002(\0162\033.CommandMessage.CommandType" +
+      "\022\032\n\tparameter\030\002 \001(\0132\007.Sensor\"=\n\013CommandT" +
+      "ype\022\r\n\tGET_STATE\020\000\022\r\n\tSET_STATE\020\001\022\020\n\014SEN" +
+      "SOR_STATE\020\002"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2912,15 +2054,9 @@ public final class SensorOuterClass {
     internal_static_Sensor_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Sensor_descriptor,
-        new java.lang.String[] { "Type", "Id", "State", "Data", });
-    internal_static_time_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_time_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_time_descriptor,
-        new java.lang.String[] { "Seconds", "Minutes", "Hours", "Day", "Month", "Year", });
+        new java.lang.String[] { "Type", "Id", "State", "Date", "Instant", });
     internal_static_CommandMessage_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(1);
     internal_static_CommandMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CommandMessage_descriptor,

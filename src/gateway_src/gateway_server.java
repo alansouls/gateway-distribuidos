@@ -6,6 +6,8 @@ import com.google.protobuf.UninitializedMessageException;
 
 import java.io.*;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+
 //import protoClass.SensorOuterClass;
 import protoClass.SensorOuterClass.CommandMessage;
 import protoClass.SensorOuterClass.Sensor;
@@ -150,7 +152,6 @@ class ConnectionTCP extends Thread {
 					e.printStackTrace();
 				}
 		}
-
 	}
 }
 
@@ -159,7 +160,7 @@ class SensorProxy extends Thread{
 	DatagramPacket DemonPacket;
 	ArrayList<sensorBuff> sensorList;
 	byte[] receiveData;
-	CommandMessage.Builder cmd;
+	CommandMessage cmd;
 	sensorBuff s;
 	
 	public SensorProxy(ArrayList<sensorBuff> sensorList) throws IOException {
@@ -168,7 +169,6 @@ class SensorProxy extends Thread{
 		byte[] receiveData = new byte[5];
 		DemonSocket = new DatagramSocket();
 		DemonPacket = new DatagramPacket(receiveData, receiveData.length);
-		cmd = CommandMessage.newBuilder();
 		s = new sensorBuff();
 		
 	}
@@ -177,7 +177,7 @@ class SensorProxy extends Thread{
 		try {
 			while(true) {
 				DemonSocket.receive(DemonPacket);
-				cmd.build().getParserForType().parseFrom(DemonPacket.getData());
+				CommandMessage cmd = CommandMessage.parseFrom((DemonPacket.getData()));
 				Sensor sensor = cmd.getParameter();
 				s = new sensorBuff();
 				//Setando_campos_do_buffer_de_sensor
@@ -187,34 +187,16 @@ class SensorProxy extends Thread{
 				
 				if(s.containSensorPerID(sensor, sensorList)==false) {
 					sensorList.add(s);
-				} else {	
-					if(sensor.getData().getYear() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() || 
-					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() && 
-					  sensor.getData().getMonth() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth()) ||
-					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
-					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
-					  sensor.getData().getDay() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay()) ||
-					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
-					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
-					  sensor.getData().getDay() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay() &&
-					  sensor.getData().getHours() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getHours()) ||
-					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
-					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
-					  sensor.getData().getDay() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay() &&
-					  sensor.getData().getHours() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getHours() &&
-					  sensor.getData().getMinutes() > sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMinutes()) ||
-					  (sensor.getData().getYear() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getYear() &&
-					  sensor.getData().getMonth() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMonth() &&
-					  sensor.getData().getDay() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getDay() &&
-					  sensor.getData().getHours() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getHours() &&
-					  sensor.getData().getMinutes() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getMinutes() &&
-					  sensor.getData().getSeconds() == sensorList.get(s.sensorListIndex(sensor, sensorList)).getSensor().getData().getSeconds())) {
-						
+				} else if(s.containSensorPerID(sensor, sensorList)==true){
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+					LocalDateTime date = LocalDateTime.parse(cmd.getParameter().getDate(),formatter);
+					int i = s.sensorListIndex(sensor, sensorList);
+					LocalDateTime dateInList = LocalDateTime.parse(sensorList.get(i).getSensor().getDate(),formatter);
+					if(date.isAfter(dateInList)) {
 						sensorList.remove(s.sensorListIndex(sensor, sensorList));
 						sensorList.add(s);
 					}
 				}
-				cmd.clear();
 				DemonPacket.setData(null);
 			}
 		} catch (IOException e) {
