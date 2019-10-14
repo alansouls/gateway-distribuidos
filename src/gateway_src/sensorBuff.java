@@ -2,6 +2,7 @@ package gateway_src;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.time.*;
 
 //import protoClass.SensorOuterClass;
 import protoClass.SensorOuterClass.Sensor;
@@ -10,6 +11,7 @@ public class sensorBuff {
 	private Sensor sensor;
 	private InetAddress IP;
 	private int port;
+	private LocalDateTime date;
 
 	public sensorBuff() {
 		
@@ -37,6 +39,14 @@ public class sensorBuff {
 
 	public Sensor getSensor(){
 		return this.sensor;
+	}
+	
+	public LocalDateTime getDate(){
+		return this.date;
+	}
+	
+	public void setDate(LocalDateTime date) {
+		this.date = date;
 	}
 	
 	public boolean containSensorPerID(Sensor sensor, ArrayList<sensorBuff> sensorList) {

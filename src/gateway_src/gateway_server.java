@@ -1,13 +1,11 @@
 package gateway_src;
 import java.net.*;
+//import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
 import com.google.protobuf.UninitializedMessageException;
-
 import java.io.*;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
-
+//import java.time.format.DateTimeFormatter;
 //import protoClass.SensorOuterClass;
 import protoClass.SensorOuterClass.CommandMessage;
 import protoClass.SensorOuterClass.Sensor;
@@ -179,20 +177,20 @@ class SensorProxy extends Thread{
 				DemonSocket.receive(DemonPacket);
 				CommandMessage cmd = CommandMessage.parseFrom((DemonPacket.getData()));
 				Sensor sensor = cmd.getParameter();
+				LocalDateTime dateSensor = LocalDateTime.now();
 				s = new sensorBuff();
 				//Setando_campos_do_buffer_de_sensor
 				s.setIP(DemonPacket.getAddress());
 				s.setPort(DemonPacket.getPort());
 				s.setSensor(sensor);
+				s.setDate(dateSensor);
 				
 				if(s.containSensorPerID(sensor, sensorList)==false) {
 					sensorList.add(s);
 				} else if(s.containSensorPerID(sensor, sensorList)==true){
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					LocalDateTime date = LocalDateTime.parse(cmd.getParameter().getDate(),formatter);
 					int i = s.sensorListIndex(sensor, sensorList);
-					LocalDateTime dateInList = LocalDateTime.parse(sensorList.get(i).getSensor().getDate(),formatter);
-					if(date.isAfter(dateInList)) {
+					LocalDateTime dateInList = sensorList.get(i).getDate();
+					if(dateSensor.isAfter(dateInList)){
 						sensorList.remove(s.sensorListIndex(sensor, sensorList));
 						sensorList.add(s);
 					}
