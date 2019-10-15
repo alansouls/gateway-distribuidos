@@ -16,14 +16,12 @@ import protoClass.SensorOuterClass.CommandMessage.CommandType;
 public class gateway_server {
 	public static void main(String args[]) throws IOException {
 		ServerSocket listenSocket = null;
-		
 		ArrayList<sensorBuff> sensorList = new ArrayList<sensorBuff>();
-		
 		int serverPort = 6543; // the server port
 		int sensorPort = 8888; // the sensor port
+		
 		try {
 			//Código_de_mensagem_de_descoberta
-			
 			CommandMessage.Builder cmd = CommandMessage.newBuilder();
 			cmd.clear();
 			cmd.setCommand(CommandType.GET_STATE);
@@ -50,6 +48,9 @@ public class gateway_server {
 class ConnectionTCP extends Thread {
 	DataInputStream in;
 	DataOutputStream out;
+	DatagramSocket socketUDP;
+	DatagramPacket packet;
+	DatagramPacket packetRec;
 	Socket clientSocket;
 	ArrayList<sensorBuff> sensorList;
 	CommandMessage.Builder cmd;
@@ -105,6 +106,23 @@ class ConnectionTCP extends Thread {
 		}
 	}
 	
+	public void sendSensorByID(CommandMessage msg) throws Exception {
+		cmd.setParameter(getSensorById(msg.getParameter().getId(), msg.getParameter().getType()));
+		cmd.setCommand(CommandType.SET_STATE);
+		byte[] request = cmd.build().toByteArray();
+		byte[] response = new byte[128];
+		socketUDP = new DatagramSocket();
+		sensorBuff s = new sensorBuff();
+		int i = s.sensorListIndex(cmd.getParameter(), sensorList);
+		packet = new DatagramPacket(request, request.length, sensorList.get(i).getIP(), sensorList.get(i).getPort());
+		packetRec = new DatagramPacket(response, response.length);
+		socketUDP.send(packet);
+		socketUDP.receive(packetRec);
+		CommandMessage cmd = CommandMessage.parseFrom(packetRec.getData());
+		updateSensorById(cmd.getParameter().getId(), cmd.getParameter());
+		cmd.writeTo(out);
+	}
+	
 	public void handleMessage(CommandMessage msg) throws IOException{
 		if (msg.getCommand() == CommandType.GET_STATE) {
 			cmd.setParameter(getSensorById(msg.getParameter().getId(), msg.getParameter().getType()));
@@ -112,13 +130,11 @@ class ConnectionTCP extends Thread {
 			out.write(sendData);
 		}
 		else if (msg.getCommand() == CommandType.SET_STATE) {
-			Sensor sensor = getSensorById(msg.getParameter().getId(), msg.getParameter().getType());
-			Sensor.Builder sensorBuilder = sensor.toBuilder();
-			sensorBuilder.setState(msg.getParameter().getState());
-			updateSensorById(sensor.getId(), sensorBuilder.build());
-			cmd.setParameter(sensorBuilder.build());
-			byte[] sendData = cmd.build().toByteArray();
-			out.write(sendData);
+			try {
+				sendSensorByID(msg);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		// não entendi o que é o SENSOR_STATE, mas se tiver que ser visto aqui, adiciona
 	}
@@ -199,7 +215,11 @@ class SensorProxy extends Thread{
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DemonSocket.close();
+		}
 	}
 
 }
@@ -227,12 +247,14 @@ class broadcast extends Thread{
 			try {
 				broadSocket.send(broadPacket);
 				Thread.sleep(1000);
-			} catch (SocketException e1) {
-				e1.printStackTrace();
+			} catch (SocketException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			} finally {
+				broadSocket.close();
 			}
 		}
 		

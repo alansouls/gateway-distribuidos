@@ -58,13 +58,13 @@ public class sensorBuff {
 		return false;
 	}
 	
-	public int sensorListIndex(Sensor sensor, ArrayList<sensorBuff> sensorList) {
+	public int sensorListIndex(Sensor sensor, ArrayList<sensorBuff> sensorList) throws Exception {
 		for(int i=0; i<sensorList.size(); i++) {
 			if(sensorList.get(i).getSensor().getId()==sensor.getId()) {
 				return i;
 			}
 		}
-		return -1;
+		throw new Exception();
 	}
 	
 }
