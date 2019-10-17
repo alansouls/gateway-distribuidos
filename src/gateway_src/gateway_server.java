@@ -26,6 +26,7 @@ public class gateway_server {
 			cmd.clear();
 			cmd.setCommand(CommandType.GET_STATE);
 			byte[] sendData = cmd.build().toByteArray();
+			
 			broadcast b = new broadcast(sendData, sensorPort);
 			b.start();
 			
@@ -145,12 +146,10 @@ class ConnectionTCP extends Thread {
 			while (true) {
 				byte[] request = new byte[1024];
 				System.out.println("Preparing to read...");
-				in.read(request);
+				CommandMessage cmdMessage = CommandMessage.parseFrom(in);
 				System.out.println("Message read");
-				CommandMessage cmdMessage = CommandMessage.parseFrom(request);
 				handleMessage(cmdMessage);
 			}
-			
 		} catch (EOFException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -221,7 +220,6 @@ class SensorProxy extends Thread{
 			DemonSocket.close();
 		}
 	}
-
 }
 
 class broadcast extends Thread{
@@ -234,19 +232,20 @@ class broadcast extends Thread{
 		this.recData = recData;
 		this.sensorPort = sensorPort;
 		broadPacket = new DatagramPacket(recData,recData.length,InetAddress.getByName("255.255.255.255"),sensorPort);
-		broadSocket = new DatagramSocket();
+		broadSocket = new DatagramSocket(7777);
 	}
 	
 	public void run(){
 		try {
 			broadSocket.setBroadcast(true);
-		} catch (SocketException e2) {
-			e2.printStackTrace();
+		} catch (SocketException e) {
+			e.printStackTrace();
 		}
-		while(true) {
 			try {
-				broadSocket.send(broadPacket);
-				Thread.sleep(1000);
+				while(true) {
+					broadSocket.send(broadPacket);
+					Thread.sleep(1000);
+				}
 			} catch (SocketException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -256,7 +255,5 @@ class broadcast extends Thread{
 			} finally {
 				broadSocket.close();
 			}
-		}
-		
 	}
 }
