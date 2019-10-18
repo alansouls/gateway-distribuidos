@@ -119,7 +119,13 @@ class ConnectionTCP extends Thread {
 		packetRec = new DatagramPacket(response, response.length);
 		socketUDP.send(packet);
 		socketUDP.receive(packetRec);
-		CommandMessage cmd = CommandMessage.parseFrom(packetRec.getData());
+		byte[] sensorByte = new byte[packetRec.getData().length];
+		response = packet.getData();
+		int size = response[0];
+		for(int j=1; j<size+1; j++) {
+			sensorByte[j-1] = response[j];
+		}
+		CommandMessage cmd = CommandMessage.parseFrom(sensorByte);
 		updateSensorById(cmd.getParameter().getId(), cmd.getParameter());
 		cmd.writeTo(out);
 	}
@@ -137,18 +143,24 @@ class ConnectionTCP extends Thread {
 				e.printStackTrace();
 			}
 		}
-		// não entendi o que é o SENSOR_STATE, mas se tiver que ser visto aqui, adiciona
 	}
 
 	public void run() {
 		try {
-			//repete o processo até dar um erro, ai fecha o socket.
+			//repete_o_processo_até_dar_um_erro,_ai_fecha_o_socket.
 			while (true) {
 				byte[] request = new byte[1024];
 				System.out.println("Preparing to read...");
-				CommandMessage cmdMessage = CommandMessage.parseFrom(in);
+				int size = in.read(request);
+				byte[] b = new byte[size];
+				for (int i = 0; i < size; i++) {
+					b[i] = request[i];
+				}
 				System.out.println("Message read");
-				handleMessage(cmdMessage);
+				CommandMessage cmdMessage = CommandMessage.parseFrom(b);
+				//handleMessage(cmdMessage);
+				out.write(cmdMessage.toByteArray());
+				System.out.println("Message send ok!");
 			}
 		} catch (EOFException e) {
 			e.printStackTrace();
@@ -164,7 +176,7 @@ class ConnectionTCP extends Thread {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-		}
+		}	
 	}
 }
 
@@ -190,7 +202,13 @@ class SensorProxy extends Thread{
 		try {
 			while(true) {
 				DemonSocket.receive(DemonPacket);
-				CommandMessage cmd = CommandMessage.parseFrom((DemonPacket.getData()));
+				byte[] sensorByte = new byte[DemonPacket.getData().length];
+				byte[] response = DemonPacket.getData();
+				int size = response[0];
+				for(int j=1; j<size+1; j++) {
+					sensorByte[j-1] = response[j];
+				}
+				CommandMessage cmd = CommandMessage.parseFrom(sensorByte);
 				Sensor sensor = cmd.getParameter();
 				LocalDateTime dateSensor = LocalDateTime.now();
 				s = new sensorBuff();

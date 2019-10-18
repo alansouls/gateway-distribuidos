@@ -14,13 +14,14 @@ class sensorFAKE {
 			serverSocket = new DatagramSocket(8888);
 			LED l1 = new LED(0, 10);
 			//System.out.println("Servidor em execução!");
-			byte[] receiveData = new byte[1024];
 			int id = 0;
 			while (true) {
 				id++;
-				System.out.println("Esperando Msg " + id + " ...");
-				DatagramPacket request = new DatagramPacket(receiveData, receiveData.length);
+				System.out.println("Esperando Requisição " + id + " ...");
+				byte[] receiveData = new byte[1024];
+				DatagramPacket request = new DatagramPacket(receiveData, receiveData.length, 8888);
 				serverSocket.receive(request);
+				System.out.println("Requisição recebida");
 				CommandMessage cmd = CommandMessage.parseFrom(request.getData());
 				if(cmd.getCommand()==CommandType.GET_STATE) {
 					cmd.toBuilder().clear();
@@ -32,7 +33,6 @@ class sensorFAKE {
 					cmd.toBuilder().setCommand(CommandType.SENSOR_STATE);
 				} else if(cmd.getCommand()==CommandType.SET_STATE) {
 					l1.setState(cmd.getParameter().getState());
-					
 					cmd.toBuilder().clear();
 					Sensor.Builder sensor = Sensor.newBuilder();
 					sensor.setState(l1.getState());
@@ -41,6 +41,9 @@ class sensorFAKE {
 					cmd.toBuilder().setParameter(sensor);
 					cmd.toBuilder().setCommand(CommandType.SENSOR_STATE);
 				}
+				request = new DatagramPacket(cmd.toByteArray(), cmd.toByteArray().length, 6543);
+				serverSocket.send(request);
+				System.out.println("Sensor enviado!");
 			}
 		} catch (SocketException e) {
 			e.printStackTrace();
