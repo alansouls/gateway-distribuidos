@@ -19,7 +19,6 @@ public class gateway_server {
 		ArrayList<sensorBuff> sensorList = new ArrayList<sensorBuff>();
 		int serverPort = 6543; // the server port
 		int sensorPort = 8888; // the sensor port
-		int sensorPortRec = 7777;
 		
 		try {
 			//Código_de_mensagem_de_descoberta
@@ -31,14 +30,14 @@ public class gateway_server {
 			broadcast b = new broadcast(sendData, sensorPort);
 			b.start();
 			
-			SensorProxy s = new SensorProxy(sensorList, sensorPortRec);
+			SensorProxy s = new SensorProxy(sensorList);
 			s.start();
 			
 			listenSocket = new ServerSocket(serverPort);
 			while (true) {
 				System.out.println("Ouvindo...");
 				Socket clientSocket = listenSocket.accept();
-				ConnectionTCP c = new ConnectionTCP(clientSocket, sensorList, sensorPortRec);
+				ConnectionTCP c = new ConnectionTCP(clientSocket, sensorList);
 				c.start();
 			}
 		} catch (IOException e) {
@@ -58,7 +57,7 @@ class ConnectionTCP extends Thread {
 	CommandMessage.Builder cmd;
 	sensorBuff sb;
 
-	public ConnectionTCP(Socket aClientSocket, ArrayList<sensorBuff> sensorList, int UDPreceivePort) throws IOException, EOFException {
+	public ConnectionTCP(Socket aClientSocket, ArrayList<sensorBuff> sensorList) throws IOException, EOFException {
 		try {
 			System.out.println("Received attempt to connect!");
 			clientSocket = aClientSocket;
@@ -119,7 +118,6 @@ class ConnectionTCP extends Thread {
 		packet = new DatagramPacket(request, request.length, sensorList.get(i).getIP(), sensorList.get(i).getPort());
 		packetRec = new DatagramPacket(response, response.length);
 		socketUDP.send(packet);
-		System.out.println("Solicitando sensor...");
 		socketUDP.receive(packetRec);
 		byte[] sensorByte = new byte[packetRec.getData().length];
 		response = packet.getData();
@@ -127,8 +125,12 @@ class ConnectionTCP extends Thread {
 		for(int j=1; j<size; j++) {
 			sensorByte[j] = response[j+1];
 		}
+<<<<<<< HEAD
 		System.out.println("Sensor atualizado recebido!");
 		CommandMessage cmd = CommandMessage.parseFrom(response);
+=======
+		CommandMessage cmd = CommandMessage.parseFrom(sensorByte);
+>>>>>>> parent of 671e535... Add ports and BuildMessages
 		updateSensorById(cmd.getParameter().getId(), cmd.getParameter());
 		cmd.writeTo(out);
 	}
@@ -191,12 +193,12 @@ class SensorProxy extends Thread{
 	CommandMessage cmd;
 	sensorBuff s;
 	
-	public SensorProxy(ArrayList<sensorBuff> sensorList, int UDPreceivePort) throws IOException {
+	public SensorProxy(ArrayList<sensorBuff> sensorList) throws IOException {
 		
 		this.sensorList = sensorList;
 		byte[] receiveData = new byte[5];
 		DemonSocket = new DatagramSocket();
-		DemonPacket = new DatagramPacket(receiveData, receiveData.length, UDPreceivePort);
+		DemonPacket = new DatagramPacket(receiveData, receiveData.length);
 		s = new sensorBuff();
 		
 	}
