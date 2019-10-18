@@ -124,11 +124,11 @@ class ConnectionTCP extends Thread {
 		byte[] sensorByte = new byte[packetRec.getData().length];
 		response = packet.getData();
 		int size = response[0];
-		for(int j=1; j<size+1; j++) {
-			sensorByte[j-1] = response[j];
+		for(int j=1; j<size; j++) {
+			sensorByte[j] = response[j+1];
 		}
 		System.out.println("Sensor atualizado recebido!");
-		CommandMessage cmd = CommandMessage.parseFrom(sensorByte);
+		CommandMessage cmd = CommandMessage.parseFrom(response);
 		updateSensorById(cmd.getParameter().getId(), cmd.getParameter());
 		cmd.writeTo(out);
 	}
@@ -265,7 +265,7 @@ class broadcast extends Thread{
 			try {
 				while(true) {
 					broadSocket.send(broadPacket);
-					Thread.sleep(1000);
+					Thread.sleep(10000);
 				}
 			} catch (SocketException e) {
 				e.printStackTrace();
