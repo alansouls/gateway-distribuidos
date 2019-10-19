@@ -111,7 +111,7 @@ class ConnectionTCP extends Thread {
 	}
 	
 	public void sendSensorByID(CommandMessage msg) throws Exception {
-		cmd.setParameter(getSensorById(msg.getParameter().getId(), msg.getParameter().getType()));
+		cmd.setParameter(msg.getParameter());
 		cmd.setCommand(CommandType.SET_STATE);
 		byte[] request = cmd.build().toByteArray();
 		byte[] response = new byte[128];
@@ -121,12 +121,11 @@ class ConnectionTCP extends Thread {
 		packet = new DatagramPacket(request, request.length, sensorList.get(i).getIP(), sensorList.get(i).getPort());
 		packetRec = new DatagramPacket(response, response.length);
 		socketUDP.send(packet);
-		socketUDP.receive(packetRec);
 		System.out.println("Sensor atualizado recebido!");
 		CommandMessage cmd = CommandMessage.parseFrom(packet.getData());
 		System.out.println(cmd.toString());
 		updateSensorById(cmd.getParameter().getId(), cmd.getParameter());
-		cmd.writeTo(out);
+		out.write(cmd.toByteArray());
 	}
 	
 	public void handleMessage(CommandMessage msg) throws IOException{
@@ -137,7 +136,8 @@ class ConnectionTCP extends Thread {
 		}
 		else if (msg.getCommand() == CommandType.SET_STATE) {
 			try {
-				sendSensorByID(msg);
+				if (getSensorById(msg.getParameter().getId(), msg.getParameter().getType()) != null)
+					sendSensorByID(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -156,7 +156,7 @@ class ConnectionTCP extends Thread {
 				for (int i = 0; i < size; i++) {
 					b[i] = request[i];
 				}
-				System.out.println(socketUDP.getInetAddress().toString());
+				//System.out.println(socketUDP.getInetAddress().toString());
 				System.out.println("Message read");
 				CommandMessage cmdMessage = CommandMessage.parseFrom(b);
 				//handleMessage(cmdMessage);
