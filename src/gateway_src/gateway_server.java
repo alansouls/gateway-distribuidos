@@ -240,7 +240,7 @@ class broadcast extends Thread{
 	public broadcast(byte[] recData, int sensorPort) throws UnknownHostException, IOException {
 		this.recData = recData;
 		this.sensorPort = sensorPort;
-		broadPacket = new DatagramPacket(recData,recData.length,InetAddress.getByName("255.255.255.255"),sensorPort);
+		broadPacket = new DatagramPacket(recData,recData.length,InetAddress.getByName("192.168.137.255"),sensorPort);
 		broadSocket = new DatagramSocket(7777);
 	}
 	
