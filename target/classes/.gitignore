@@ -1,4 +1,4 @@
-/com/
-/gateway_src/
-/protoClass/
-/META-INF/
+/com/*
+/gateway_src/*
+/protoClass/*
+/META-INF/*
