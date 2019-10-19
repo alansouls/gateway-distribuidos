@@ -121,6 +121,7 @@ class ConnectionTCP extends Thread {
 		socketUDP.receive(packetRec);
 		System.out.println("Sensor atualizado recebido!");
 		CommandMessage cmd = CommandMessage.parseFrom(packet.getData());
+		System.out.println(cmd.toString());
 		updateSensorById(cmd.getParameter().getId(), cmd.getParameter());
 		cmd.writeTo(out);
 	}
@@ -198,6 +199,7 @@ class SensorProxy extends Thread{
 			while(true) {
 				DemonSocket.receive(DemonPacket);
 				CommandMessage cmd = CommandMessage.parseFrom(DemonPacket.getData());
+				System.out.println(cmd.toString());
 				Sensor sensor = cmd.getParameter();
 				LocalDateTime dateSensor = LocalDateTime.now();
 				s = new sensorBuff();
