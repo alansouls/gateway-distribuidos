@@ -17,8 +17,10 @@ public class gateway_server {
 	public static void main(String args[]) throws IOException {
 		ServerSocket listenSocket = null;
 		ArrayList<sensorBuff> sensorList = new ArrayList<sensorBuff>();
+		int sensorReceivePort = 7777;
 		int serverPort = 6543; // the server port
 		int sensorPort = 8888; // the sensor port
+		DatagramSocket socket = new DatagramSocket(sensorReceivePort);
 		
 		try {
 			//Código_de_mensagem_de_descoberta
@@ -27,17 +29,17 @@ public class gateway_server {
 			cmd.setCommand(CommandType.GET_STATE);
 			byte[] sendData = cmd.build().toByteArray();
 			
-			broadcast b = new broadcast(sendData, sensorPort);
+			broadcast b = new broadcast(sendData, sensorPort, socket);
 			b.start();
 			
-			SensorProxy s = new SensorProxy(sensorList);
+			SensorProxy s = new SensorProxy(sensorList, sensorReceivePort, socket);
 			s.start();
 			
 			listenSocket = new ServerSocket(serverPort);
 			while (true) {
 				System.out.println("Ouvindo...");
 				Socket clientSocket = listenSocket.accept();
-				ConnectionTCP c = new ConnectionTCP(clientSocket, sensorList);
+				ConnectionTCP c = new ConnectionTCP(clientSocket, sensorList, socket);
 				c.start();
 			}
 		} catch (IOException e) {
@@ -57,7 +59,7 @@ class ConnectionTCP extends Thread {
 	CommandMessage.Builder cmd;
 	sensorBuff sb;
 
-	public ConnectionTCP(Socket aClientSocket, ArrayList<sensorBuff> sensorList) throws IOException, EOFException {
+	public ConnectionTCP(Socket aClientSocket, ArrayList<sensorBuff> sensorList, DatagramSocket socket) throws IOException, EOFException {
 		try {
 			System.out.println("Received attempt to connect!");
 			clientSocket = aClientSocket;
@@ -66,6 +68,7 @@ class ConnectionTCP extends Thread {
 			out = new DataOutputStream(clientSocket.getOutputStream());
 			cmd = CommandMessage.newBuilder();
 			sb = new sensorBuff();
+			this.socketUDP = socket;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -76,13 +79,13 @@ class ConnectionTCP extends Thread {
 	
 	public Sensor getSensorById(int id, SensorType type) {
 		if (id == -1) {
-			for (int i = 0; i < sensorList.size() -1; i++) {
+			for (int i = 0; i < sensorList.size(); i++) {
 				if (sensorList.get(i).getSensor().getType() == type) {
 					return sensorList.get(i).getSensor();
 				}
 			}
 		}
-		for (int i = 0; i < sensorList.size() -1; i++) {
+		for (int i = 0; i < sensorList.size(); i++) {
 			if (sensorList.get(i).getSensor().getId() == id) {
 				return sensorList.get(i).getSensor();
 			}
@@ -91,7 +94,7 @@ class ConnectionTCP extends Thread {
 	}
 	
 	public void removeSensorById(int id) {
-		for (int i = 0; i < sensorList.size() -1; i++) {
+		for (int i = 0; i < sensorList.size(); i++) {
 			if (sensorList.get(i).getSensor().getId() == id) {
 				sensorList.remove(sensorList.get(i));
 				break;
@@ -100,7 +103,7 @@ class ConnectionTCP extends Thread {
 	}
 	
 	public void updateSensorById(int id, Sensor sensor) {
-		for (int i = 0; i < sensorList.size() -1; i++) {
+		for (int i = 0; i < sensorList.size(); i++) {
 			if (sensorList.get(i).getSensor().getId() == id) {
 				sensorList.get(i).setSensor(sensor);
 			}
@@ -112,7 +115,7 @@ class ConnectionTCP extends Thread {
 		cmd.setCommand(CommandType.SET_STATE);
 		byte[] request = cmd.build().toByteArray();
 		byte[] response = new byte[128];
-		socketUDP = new DatagramSocket();
+		//InetAddress inet = InetAddress.getByName("192.168.137.1");
 		sensorBuff s = new sensorBuff();
 		int i = s.sensorListIndex(cmd.getParameter(), sensorList);
 		packet = new DatagramPacket(request, request.length, sensorList.get(i).getIP(), sensorList.get(i).getPort());
@@ -146,12 +149,14 @@ class ConnectionTCP extends Thread {
 			//repete_o_processo_até_dar_um_erro,_ai_fecha_o_socket.
 			while (true) {
 				byte[] request = new byte[1024];
+				System.out.println(sensorList.size());
 				System.out.println("Preparing to read...");
 				int size = in.read(request);
 				byte[] b = new byte[size];
 				for (int i = 0; i < size; i++) {
 					b[i] = request[i];
 				}
+				System.out.println(socketUDP.getInetAddress().toString());
 				System.out.println("Message read");
 				CommandMessage cmdMessage = CommandMessage.parseFrom(b);
 				//handleMessage(cmdMessage);
@@ -177,28 +182,34 @@ class ConnectionTCP extends Thread {
 }
 
 class SensorProxy extends Thread{
-	DatagramSocket DemonSocket;
+	
 	DatagramPacket DemonPacket;
 	ArrayList<sensorBuff> sensorList;
 	byte[] receiveData;
 	CommandMessage cmd;
 	sensorBuff s;
+	DatagramSocket socket;
 	
-	public SensorProxy(ArrayList<sensorBuff> sensorList) throws IOException {
+	public SensorProxy(ArrayList<sensorBuff> sensorList, int serverPort, DatagramSocket socket) throws IOException {
 		
 		this.sensorList = sensorList;
-		byte[] receiveData = new byte[5];
-		DemonSocket = new DatagramSocket();
+		byte[] receiveData = new byte[128];
 		DemonPacket = new DatagramPacket(receiveData, receiveData.length);
 		s = new sensorBuff();
+		this.socket = socket;
 		
 	}
 	
 	public void run() {
 		try {
 			while(true) {
-				DemonSocket.receive(DemonPacket);
-				CommandMessage cmd = CommandMessage.parseFrom(DemonPacket.getData());
+				System.out.println("Pronto para receber respostas:");
+				socket.receive(DemonPacket);
+			    byte[] data = new byte[DemonPacket.getLength()];
+			    for (int i = 0; i < data.length; i++) {
+			     data[i] = DemonPacket.getData()[i];
+			    }
+			    CommandMessage cmd = CommandMessage.parseFrom(data);
 				System.out.println(cmd.toString());
 				Sensor sensor = cmd.getParameter();
 				LocalDateTime dateSensor = LocalDateTime.now();
@@ -211,37 +222,35 @@ class SensorProxy extends Thread{
 				
 				if(s.containSensorPerID(sensor, sensorList)==false) {
 					sensorList.add(s);
+					System.out.println("Adicionando sensor!");
 				} else if(s.containSensorPerID(sensor, sensorList)==true){
 					int i = s.sensorListIndex(sensor, sensorList);
 					LocalDateTime dateInList = sensorList.get(i).getDate();
 					if(dateSensor.isAfter(dateInList)){
-						sensorList.remove(s.sensorListIndex(sensor, sensorList));
+						sensorList.remove(i);
 						sensorList.add(s);
 					}
 				}
-				DemonPacket.setData(null);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			DemonSocket.close();
+		} 
 		}
 	}
-}
 
 class broadcast extends Thread{
 	DatagramSocket broadSocket;
 	DatagramPacket broadPacket;
 	byte[] recData;
-	int sensorPort;
+	int sensorPort, serverPort;
 	
-	public broadcast(byte[] recData, int sensorPort) throws UnknownHostException, IOException {
+	public broadcast(byte[] recData, int sensorPort, DatagramSocket socket) throws UnknownHostException, IOException {
 		this.recData = recData;
 		this.sensorPort = sensorPort;
 		broadPacket = new DatagramPacket(recData,recData.length,InetAddress.getByName("192.168.137.255"),sensorPort);
-		broadSocket = new DatagramSocket(7777);
+		broadSocket = socket;
 	}
 	
 	public void run(){
@@ -261,8 +270,6 @@ class broadcast extends Thread{
 				e.printStackTrace();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			} finally {
-				broadSocket.close();
 			}
 	}
 }
