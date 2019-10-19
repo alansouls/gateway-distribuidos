@@ -155,7 +155,7 @@ class ConnectionTCP extends Thread {
 				System.out.println("Message read");
 				CommandMessage cmdMessage = CommandMessage.parseFrom(b);
 				//handleMessage(cmdMessage);
-				out.write(cmdMessage.toByteArray());
+				handleMessage(cmdMessage);
 				System.out.println("Message send ok!");
 			}
 		} catch (EOFException e) {
