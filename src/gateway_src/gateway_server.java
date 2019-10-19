@@ -130,6 +130,7 @@ class ConnectionTCP extends Thread {
 	
 	public void handleMessage(CommandMessage msg) throws IOException{
 		if (msg.getCommand() == CommandType.GET_STATE) {
+			cmd.setCommand(CommandType.SET_STATE);
 			cmd.setParameter(getSensorById(msg.getParameter().getId(), msg.getParameter().getType()));
 			byte[] sendData = cmd.build().toByteArray();
 			out.write(sendData);
@@ -168,6 +169,9 @@ class ConnectionTCP extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (UninitializedMessageException e) {
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		finally {
 				try {
