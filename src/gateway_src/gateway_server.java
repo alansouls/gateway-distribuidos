@@ -90,6 +90,7 @@ class ConnectionTCP extends Thread {
 				return sensorList.get(i).getSensor();
 			}
 		}
+		
 		return null;
 	}
 	
@@ -131,14 +132,42 @@ class ConnectionTCP extends Thread {
 	public void handleMessage(CommandMessage msg) throws IOException{
 		if (msg.getCommand() == CommandType.GET_STATE) {
 			cmd.setCommand(CommandType.SET_STATE);
-			cmd.setParameter(getSensorById(msg.getParameter().getId(), msg.getParameter().getType()));
-			byte[] sendData = cmd.build().toByteArray();
-			out.write(sendData);
+			
+			Sensor sensorTemp = getSensorById(msg.getParameter().getId(), msg.getParameter().getType());
+			
+			if ( sensorTemp != null) {
+				cmd.setParameter(sensorTemp);
+				byte[] sendData = cmd.build().toByteArray();
+				out.write(sendData);
+			}else {
+				Sensor.Builder sensorDefault = Sensor.newBuilder();
+				
+				sensorDefault.setId(msg.getParameter().getId());
+				sensorDefault.setState(0);
+				sensorDefault.setType(msg.getParameter().getType());
+				
+				cmd.setParameter(sensorDefault);
+				byte[] sendData = cmd.build().toByteArray();
+				out.write(sendData);
+			}
+			
 		}
 		else if (msg.getCommand() == CommandType.SET_STATE) {
 			try {
-				if (getSensorById(msg.getParameter().getId(), msg.getParameter().getType()) != null)
+				if (getSensorById(msg.getParameter().getId(), msg.getParameter().getType()) != null) {
 					sendSensorByID(msg);
+				}else {
+					Sensor.Builder sensorDefault = Sensor.newBuilder();
+					
+					sensorDefault.setId(msg.getParameter().getId());
+					sensorDefault.setState(0);
+					sensorDefault.setType(msg.getParameter().getType());
+					
+					cmd.setParameter(sensorDefault);
+					byte[] sendData = cmd.build().toByteArray();
+					out.write(sendData);
+				}
+					
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
