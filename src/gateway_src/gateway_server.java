@@ -10,8 +10,6 @@ import protoClass.SensorOuterClass.CommandMessage.CommandType;
 public class gateway_server {
 
 	public static void main(String args[]) throws IOException {
-
-		ArrayList<sensorBuff> sensorList = new ArrayList<sensorBuff>();
 		
 		String rabbitHost = "ec2-3-89-88-24.compute-1.amazonaws.com";
 		String exchangeName = "DIST";
@@ -37,27 +35,9 @@ public class gateway_server {
 			broadcast b = new broadcast(sendData, sensorPort, socket);
 			b.start();
 
-			SensorProxy s = new SensorProxy(sensorList, sensorReceivePort, socket);
+			SensorProxy s = new SensorProxy(pub, sensorReceivePort, socket);
 			s.start();
 			
-			// Ler os dados da lista e envia para o RabbitMQ
-			while (true) {
-								
-				if(sensorList.isEmpty() == false) {
-					sensorBuff sensor = sensorList.remove(0);
-					float sensorState = sensor.getSensor().getState();
-					
-					String sensorType = sensor.getSensor().getType().toString();
-					String data = Float.toString(sensorState);
-			
-					try {
-						pub.publishData(data, sensorType);
-					} catch (Exception e) {
-						System.out.println("Erro na conexão com RabbitMQ.");
-					}
-				}
-			}
-
 		} catch (IOException e) {
 
 			e.printStackTrace();

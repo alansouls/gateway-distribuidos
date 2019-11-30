@@ -12,19 +12,17 @@ import protoClass.SensorOuterClass.Sensor;
 public class SensorProxy extends Thread {
 
 	DatagramPacket DemonPacket;
-	ArrayList<sensorBuff> sensorList;
 	byte[] receiveData;
 	CommandMessage cmd;
-	sensorBuff s;
 	DatagramSocket socket;
+	QueuePublisher pub;
 
-	public SensorProxy(ArrayList<sensorBuff> sensorList, int serverPort, DatagramSocket socket) throws IOException {
+	public SensorProxy(QueuePublisher pub, int serverPort, DatagramSocket socket) throws IOException {
 
-		this.sensorList = sensorList;
 		byte[] receiveData = new byte[128];
-		DemonPacket = new DatagramPacket(receiveData, receiveData.length);
-		s = new sensorBuff();
+		this.DemonPacket = new DatagramPacket(receiveData, receiveData.length);
 		this.socket = socket;
+		this.pub = pub;
 
 	}
 
@@ -49,19 +47,19 @@ public class SensorProxy extends Thread {
 
 				Sensor sensor = cmd.getParameter();
 
-				LocalDateTime dateSensor = LocalDateTime.now();
-
-				s = new sensorBuff();
-
-				// Setando_campos_do_buffer_de_sensor
-				s.setIP(DemonPacket.getAddress());
-				s.setPort(DemonPacket.getPort());
-				s.setSensor(sensor);
-				s.setDate(dateSensor);
-
-				sensorList.add(s);
-
-				System.out.println("Adicionando sensor!");
+				float sensorState = sensor.getState();
+				
+				String sensorType = sensor.getType().toString();
+				
+				System.out.println("AQUUUI"+sensorType);
+				
+				String dataSend = Float.toString(sensorState);
+		
+				try {
+					this.pub.publishData(dataSend, sensorType);
+				} catch (Exception e) {
+					System.out.println("Erro na conexão com RabbitMQ.");
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
