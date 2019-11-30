@@ -50,9 +50,7 @@ public class SensorProxy extends Thread {
 				float sensorState = sensor.getState();
 				
 				String sensorType = sensor.getType().toString();
-				
-				System.out.println("AQUUUI"+sensorType);
-				
+							
 				String dataSend = Float.toString(sensorState);
 		
 				try {

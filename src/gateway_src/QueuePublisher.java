@@ -23,7 +23,6 @@ public class QueuePublisher extends Thread {
 		factory.setUsername(username);
 		factory.setPassword(password);
 		try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-			channel.exchangeDeclare(exchangeName, "direct");
 
 			channel.basicPublish(exchangeName, routingKey, null, message.getBytes("UTF-8"));
 			System.out.println(" [x] Sent '" + message + "'");
