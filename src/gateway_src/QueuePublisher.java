@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import com.rabbitmq.client.*;
 
+import protoClass.SensorOuterClass.CommandMessage;
+import protoClass.SensorOuterClass.Sensor;
+
 public class QueuePublisher extends Thread {
 	private String host;
 	private String username;
@@ -16,16 +19,16 @@ public class QueuePublisher extends Thread {
 		this.password = password;
 		this.exchangeName = exchangeName;
 	}
+	
+	
 
-	public void publishData(String message, String routingKey) throws Exception {
+	public void publishData(String msg, String routingKey) throws Exception {
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost(host);
 		factory.setUsername(username);
 		factory.setPassword(password);
-		try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-
-			channel.basicPublish(exchangeName, routingKey, null, message.getBytes("UTF-8"));
-			System.out.println(" [x] Sent '" + message + "'");
+		try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {		
+			channel.basicPublish(exchangeName, routingKey, null, msg.getBytes("UTF-8"));
 		}
 	}
 }

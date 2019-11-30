@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import protoClass.SensorOuterClass.CommandMessage;
 import protoClass.SensorOuterClass.Sensor;
+import protoClass.SensorOuterClass.CommandMessage.CommandType;
+
 
 public class SensorProxy extends Thread {
 
@@ -25,6 +27,16 @@ public class SensorProxy extends Thread {
 		this.pub = pub;
 
 	}
+	
+	private String getByteString(byte[] bytes){
+        String str = "/";
+        for (int i = 0; i < bytes.length; i++){
+            str += Integer.toString(bytes[i]);
+            str += "/";
+        }
+
+        return str;
+    }
 
 	public void run() {
 		try {
@@ -41,20 +53,24 @@ public class SensorProxy extends Thread {
 
 				}
 
-				CommandMessage cmd = CommandMessage.parseFrom(data);
-
-				System.out.println(cmd.toString());
-
-				Sensor sensor = cmd.getParameter();
-
-				float sensorState = sensor.getState();
+				CommandMessage msg = CommandMessage.parseFrom(data);
 				
+				Sensor sensor = msg.getParameter();			
+				
+				CommandMessage.Builder cmd = CommandMessage.newBuilder();
+				cmd.setParameter(sensor);
+				cmd.setCommand(CommandType.SET_STATE);
+
+				System.out.println(cmd.toString());		
+			
 				String sensorType = sensor.getType().toString();
-							
-				String dataSend = Float.toString(sensorState);
+				
+				byte[] msg_byte = cmd.build().toByteArray();
+				
+				String msg_string = getByteString(msg_byte);
 		
-				try {
-					this.pub.publishData(dataSend, sensorType);
+				try {	
+					this.pub.publishData(msg_string, sensorType);
 				} catch (Exception e) {
 					System.out.println("Erro na conexão com RabbitMQ.");
 				}
