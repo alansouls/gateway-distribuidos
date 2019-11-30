@@ -12,7 +12,6 @@ import protoClass.SensorOuterClass.Sensor;
 import protoClass.SensorOuterClass.Sensor.SensorType;
 //import protoClass.SensorOuterClass.Sensor.SensorType;
 import protoClass.SensorOuterClass.CommandMessage.CommandType;
-
 public class gateway_server {
 	public static void main(String args[]) throws IOException {
 		ServerSocket listenSocket = null;
@@ -150,7 +149,6 @@ class ConnectionTCP extends Thread {
 				byte[] sendData = cmd.build().toByteArray();
 				out.write(sendData);
 			}
-			
 		}
 		else if (msg.getCommand() == CommandType.SET_STATE) {
 			try {
@@ -167,7 +165,6 @@ class ConnectionTCP extends Thread {
 					byte[] sendData = cmd.build().toByteArray();
 					out.write(sendData);
 				}
-					
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
