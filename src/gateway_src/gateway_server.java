@@ -2,8 +2,6 @@ package gateway_src;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import protoClass.SensorOuterClass.CommandMessage;
