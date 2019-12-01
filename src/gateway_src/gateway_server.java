@@ -40,7 +40,7 @@ public class gateway_server {
 			SensorProxy s = new SensorProxy(sensorList, pub, sensorReceivePort, socket);
 			s.start();
 			
-			RabbitRPC r = new RabbitRPC(sensorList, socket, rabbitHost, exchangeName, user, pass);
+			RabbitRPC r = new RabbitRPC(sensorList, socket, rabbitHost, user, pass);
 			r.start();
 			
 			
