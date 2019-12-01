@@ -18,13 +18,17 @@ public class SensorProxy extends Thread {
 	CommandMessage cmd;
 	DatagramSocket socket;
 	QueuePublisher pub;
+	sensorBuff s;
+	ArrayList<sensorBuff> sensorList;
 
-	public SensorProxy(QueuePublisher pub, int serverPort, DatagramSocket socket) throws IOException {
+	public SensorProxy(ArrayList<sensorBuff> sensorList, QueuePublisher pub, int serverPort, DatagramSocket socket) throws IOException {
 
 		byte[] receiveData = new byte[128];
 		this.DemonPacket = new DatagramPacket(receiveData, receiveData.length);
 		this.socket = socket;
 		this.pub = pub;
+		s = new sensorBuff();
+		this.sensorList = sensorList;
 
 	}
 	
@@ -55,16 +59,24 @@ public class SensorProxy extends Thread {
 
 				CommandMessage msg = CommandMessage.parseFrom(data);
 				
-				Sensor sensor = msg.getParameter();			
+				System.out.println(msg.toString());		
+				
+				Sensor sensor = msg.getParameter();	
+				String sensorType = sensor.getType().toString();
+				LocalDateTime dateSensor = LocalDateTime.now();
+								
+				s = new sensorBuff();
+				
+				// Setando campoos do buffer de sensor
+				s.setIP(DemonPacket.getAddress());
+				s.setPort(DemonPacket.getPort());
+				s.setSensor(sensor);
+				s.setDate(dateSensor);
 				
 				CommandMessage.Builder cmd = CommandMessage.newBuilder();
 				cmd.setParameter(sensor);
 				cmd.setCommand(CommandType.SET_STATE);
-
-				System.out.println(cmd.toString());		
-			
-				String sensorType = sensor.getType().toString();
-				
+							
 				byte[] msg_byte = cmd.build().toByteArray();
 				
 				String msg_string = getByteString(msg_byte);
@@ -73,6 +85,19 @@ public class SensorProxy extends Thread {
 					this.pub.publishData(msg_string, sensorType);
 				} catch (Exception e) {
 					System.out.println("Erro na conexão com RabbitMQ.");
+				}
+				
+								
+				if(s.containSensorPerID(sensor, sensorList)==false) {
+					sensorList.add(s);
+					System.out.println("Adicionando sensor!");
+				} else if(s.containSensorPerID(sensor, sensorList)==true){
+					int i = s.sensorListIndex(sensor, sensorList);
+					LocalDateTime dateInList = sensorList.get(i).getDate();
+					if(dateSensor.isAfter(dateInList)){
+						sensorList.remove(i);
+						sensorList.add(s);
+					}
 				}
 			}
 		} catch (IOException e) {

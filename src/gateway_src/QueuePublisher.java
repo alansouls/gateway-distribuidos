@@ -1,11 +1,6 @@
 package gateway_src;
 
-import java.util.ArrayList;
-
 import com.rabbitmq.client.*;
-
-import protoClass.SensorOuterClass.CommandMessage;
-import protoClass.SensorOuterClass.Sensor;
 
 public class QueuePublisher extends Thread {
 	private String host;

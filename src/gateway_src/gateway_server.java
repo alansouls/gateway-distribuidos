@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import protoClass.SensorOuterClass.CommandMessage;
 import protoClass.SensorOuterClass.CommandMessage.CommandType;
 
+
 public class gateway_server {
 
 	public static void main(String args[]) throws IOException {
@@ -17,6 +18,7 @@ public class gateway_server {
 		String pass = "dist";
 		
 		QueuePublisher pub = new QueuePublisher(rabbitHost, exchangeName, user, pass);
+		ArrayList<sensorBuff> sensorList = new ArrayList<sensorBuff>();
 
 		int sensorReceivePort = 7777;
 		int sensorPort = 8888; // the sensor port
@@ -35,8 +37,12 @@ public class gateway_server {
 			broadcast b = new broadcast(sendData, sensorPort, socket);
 			b.start();
 
-			SensorProxy s = new SensorProxy(pub, sensorReceivePort, socket);
+			SensorProxy s = new SensorProxy(sensorList, pub, sensorReceivePort, socket);
 			s.start();
+			
+			RabbitRPC r = new RabbitRPC(sensorList, socket, rabbitHost, exchangeName, user, pass);
+			r.start();
+			
 			
 		} catch (IOException e) {
 
