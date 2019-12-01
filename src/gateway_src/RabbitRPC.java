@@ -56,6 +56,7 @@ public class RabbitRPC extends Thread {
 
 		try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
 			channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
+			channel.queuePurge(RPC_QUEUE_NAME);
 
 			channel.basicQos(1);
 
@@ -113,7 +114,7 @@ public class RabbitRPC extends Thread {
 						if (sensor != null) {
 							Sensor.Builder sensor_send = sensor.toBuilder();
 							sensor_send.setState(Float.parseFloat(result[2]));
-							cmd.setParameter(sensor);
+							cmd.setParameter(sensor_send);
 
 							byte[] sendData = cmd.build().toByteArray();
 
